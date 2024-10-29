@@ -18,7 +18,7 @@ const commonStyles =
   );
 
 export const Eth = () => {  
-  const {connectWallet, connectAccount, FormData, setFormData, handleChange, sendTransaction} = useContext(TransactionContext);
+  const {connectWallet, connectAccount, FormData, setFormData, handleChange, sendTransaction, AccountId, isLoading} = useContext(TransactionContext);
 
 
     const handleSubmit = (e) => {
@@ -62,18 +62,18 @@ export const Eth = () => {
           </div>
         </div>
         <div className="flex flex-col flex-1 items-center justify-start  w-full md:mt-0 mt-10">
-          <div className="p-3 justify-end items-start flex-col rounded-xl h-40 sm:w-72 w-full my-5 eth-card white-glassmorphism">
+          <div className="p-5 justify-end items-start flex-col rounded-xl h-40 sm:w-72 w-full my-5 eth-card white-glassmorphism">
             <div className="flex justify-between flex-col w-full h-4">
               <div className="flex justify-between item-start">
-                <div className="w-10 h-10 rounded-full border-2 border-white flex justify-center items-center">
-                    <span>Eth</span>
-                </div>
+                  {/* <div className="w-10 h-10 rounded-full border-2 border-white flex justify-center items-center">
+                      <span>Eth</span>
+                  </div> */}
                 <div>
                     <p>
                         Address
                     </p>
                     <p className="font-light tex-sm">
-                        0xjsdnvkjfbkjs.....jdbvhbsd
+                        {AccountId}
                     </p>
                 </div>
               </div>
@@ -85,7 +85,7 @@ export const Eth = () => {
         <Input placeholder="Keyword (Gif)" name="keyword" type="text" handleChange={handleChange} />
         <Input placeholder="Enter message" name="message" type="text" handleChange={handleChange} />
         <div className="h-[1px] w-full bg-gray-400 my-2" />
-        { false ? (
+        { isLoading ? (
           <span>Loading...</span>
         ) : (
           <button

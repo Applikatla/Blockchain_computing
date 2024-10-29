@@ -14,17 +14,19 @@ const getEthereumContract = () => {
     const signer = provider.getSigner();
     const transactionContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-    console.log({
-        provider,
-        signer,
-        transactionContract
-    });
+    return transactionContract;
 
 }
 
 export const TransactionProvider = ({ children }) => {
 
+    const [isLoading, setisLoading] = useState(false);
+
     const [connectAccount, setConnectAccount] = useState('');
+
+    const [TransactionCount, setTransactionCount] = useState(localStorage.getItem('TransactionCount')); //we are storing the value in the localstorage to avoid value loss at the time of page reload
+
+    const [AccountId, setAccountId] = useState("");
 
     const [FormData, setFormData] = useState({addressTo:"", amount:"", keyword:"", message:""});
 
@@ -45,6 +47,7 @@ export const TransactionProvider = ({ children }) => {
             } else {
                 console.log('No accounts found');
             }
+            setAccountId(accounts);
             console.log(accounts);
             
         } catch (error) {
@@ -73,7 +76,31 @@ export const TransactionProvider = ({ children }) => {
 
             console.log(FormData);
 
-            getEthereumContract();
+            const transactionContract = getEthereumContract();
+
+            const parsedAmount = ethers.utils.parseEther(amount); //to convert decimals into GWEI hex amount
+
+            await ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [{
+                    from: connectAccount,
+                    to: addressTo,
+                    gas: '0x5208', //21000 GWEI
+                    value: parsedAmount._hex, 
+                }]
+            });
+
+            const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmount, message, keyword);
+
+            setisLoading(true);
+            alert(`Loading - ${transactionHash.hash}`);
+            await transactionHash.wait();
+            setisLoading(false);
+            alert(`Sucess - ${transactionHash.hash}`)
+
+            const transactionsCount = await transactionContract.getTransactionCount();
+
+            setConnectAccount(TransactionCount.toNumber());    
         } catch (error) {
             console.log(error);
         }
@@ -82,7 +109,7 @@ export const TransactionProvider = ({ children }) => {
         checkIfWalletIsConnected();
     }, []);
     return (
-        <TransactionContext.Provider value={{ connectWallet, connectAccount, FormData, setFormData, handleChange, sendTransaction}}>
+        <TransactionContext.Provider value={{ connectWallet, connectAccount, FormData, setFormData, handleChange, sendTransaction, AccountId, isLoading}}>
             {children}
         </TransactionContext.Provider>
     );

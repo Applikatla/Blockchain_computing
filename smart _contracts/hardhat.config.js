@@ -8,7 +8,7 @@ module.exports = {
   networks: {
     holesky: {
       url: 'https://eth-holesky.g.alchemy.com/v2/URsTZprMHu2Gbqs0fFdHnX7I0hSl5dkX',
-      accounts: [ '672286e799bb32051042352f02b56a06f6b9b5455d916134f00659f91337391f' ]
+      accounts: [ 'Add your metamask private key to deploy your contract' ]
     }
   }
 };
