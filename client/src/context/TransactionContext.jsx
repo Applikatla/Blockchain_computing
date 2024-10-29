@@ -28,6 +28,8 @@ export const TransactionProvider = ({ children }) => {
 
     const [AccountId, setAccountId] = useState("");
 
+    const [THash, setTHash] = useState("");
+
     const [FormData, setFormData] = useState({addressTo:"", amount:"", keyword:"", message:""});
 
     const handleChange = (e, name) => {
@@ -93,10 +95,14 @@ export const TransactionProvider = ({ children }) => {
             const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmount, message, keyword);
 
             setisLoading(true);
-            alert(`Loading - ${transactionHash.hash}`);
+            // alert(`Loading - ${transactionHash.hash}`);
             await transactionHash.wait();
             setisLoading(false);
             alert(`Sucess - ${transactionHash.hash}`)
+
+            setTHash(transactionHash);
+
+            console.log(THash);
 
             const transactionsCount = await transactionContract.getTransactionCount();
 
