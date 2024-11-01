@@ -1,5 +1,4 @@
 import React from "react";
-
 import { useContext } from "react";
 
 import { TransactionContext } from "../context/TransactionContext";
@@ -21,8 +20,10 @@ export const Eth = () => {
   const {connectWallet, connectAccount, FormData, setFormData, handleChange, sendTransaction, AccountId, isLoading} = useContext(TransactionContext);
 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       const { addressTo, amount, keyword, message } = FormData;
+
+      console.log(FormData);
 
       e.preventDefault(); //to prevent rerendering while submit
 
@@ -31,6 +32,18 @@ export const Eth = () => {
       }
       // console.log(FormData);
       sendTransaction();
+
+      try {
+        const body = { addressTo, amount, keyword, message };
+        const response = await fetch("http://localhost:8000/submit", {
+          method: 'POST',
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(body)
+        });
+        console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
     }
   return (
     
@@ -88,10 +101,10 @@ export const Eth = () => {
         { isLoading ? (
           <span>Loading...</span>
         ) : (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full"           
+          <button 
+          type="button"
+          onClick={handleSubmit}
+          className="w-full mt-2 border-[1px] p-2 border-[#3d4f7c] rounded-full"           
           >
             click to send
           </button>

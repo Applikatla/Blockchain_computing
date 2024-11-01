@@ -76,7 +76,7 @@ export const TransactionProvider = ({ children }) => {
 
             const { addressTo, amount, keyword, message } = FormData; //after call sendTransaction in Eth.jsx form will fill and send to here
 
-            console.log(FormData);
+            // console.log(FormData);
 
             const transactionContract = getEthereumContract();
 

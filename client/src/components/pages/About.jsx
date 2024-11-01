@@ -1,9 +1,7 @@
 import {React, useContext} from 'react'
 
-import { TransactionContext } from '../../context/TransactionContext';
 
 export const About = () => {
-  const {value} = useContext(TransactionContext);
 
   return (
     <>
