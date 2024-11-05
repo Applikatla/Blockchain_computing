@@ -17,7 +17,7 @@ const commonStyles =
   );
 
 export const Eth = () => {  
-  const {connectWallet, connectAccount, FormData, setFormData, handleChange, sendTransaction, AccountId, isLoading} = useContext(TransactionContext);
+  const {connectWallet, connectAccount, FormData, setFormData, handleChange, sendTransaction, AccountId, isLoading, Isconform, setIsconform} = useContext(TransactionContext);
 
 
     const handleSubmit = async (e) => {
@@ -32,17 +32,19 @@ export const Eth = () => {
       }
       // console.log(FormData);
       sendTransaction();
-
-      try {
-        const body = { addressTo, amount, keyword, message };
-        const response = await fetch("http://localhost:8000/submit", {
-          method: 'POST',
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify(body)
-        });
-        console.log(response);
-      } catch (error) {
-        console.log(error);
+      if (!Isconform) {
+        try {
+          const body = { addressTo, amount, keyword, message };
+          const response = await fetch("http://localhost:8000/submit", {
+            method: 'POST',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(body)
+          });
+          console.log(response);
+          setIsconform(true);
+        } catch (error) {
+          console.log(error);
+        }
       }
     }
   return (
