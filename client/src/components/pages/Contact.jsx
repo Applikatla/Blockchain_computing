@@ -1,8 +1,11 @@
 import React from 'react'
+import { Navbar } from '../Navbar'
 
 export const Contact = () => {
   return (
     <>
+    <Navbar/>
+    <div className='gradient-bg-welcome'>
     <div className="text-center Home">
       <h1 className="text-white">Email</h1>
       <br />
@@ -14,6 +17,7 @@ export const Contact = () => {
         explicabo aspernatur.
       </div>
 
+    </div>
     </div>
   </>
   )

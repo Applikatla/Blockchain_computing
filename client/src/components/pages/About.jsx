@@ -1,10 +1,13 @@
 import {React, useContext} from 'react'
+import { Navbar } from '../Navbar'
 
 
 export const About = () => {
 
   return (
     <>
+    <Navbar/>
+     <div className='gradient-bg-welcome'>
     <div className="text-center Home">
       <h1 className="text-white">About us</h1>
       <br />
@@ -17,6 +20,7 @@ export const About = () => {
       </div>
 
     </div>
+     </div>
   </>
   )
 }

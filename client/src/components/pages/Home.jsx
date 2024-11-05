@@ -1,10 +1,13 @@
 import React from "react";
 import './Home.css'
+import { Navbar } from "../Navbar";
 
 
 export const Home = () => {
   return (
     <>
+    <Navbar/>
+    <div className='gradient-bg-welcome'>
       <div className="text-center Home">
         <h1 className="text-white">Welcome to the world of Blockchain</h1>
         <br />
@@ -16,6 +19,7 @@ export const Home = () => {
           explicabo aspernatur.
         </div>
       </div>
+    </div>
     </>
   );
 };
