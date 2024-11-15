@@ -10,6 +10,7 @@ import { Contact } from './components/pages/Contact'
 import { Transactions } from './components/pages/Transactions'
 import Register from './components/pages/login/Register'
 import Login from './components/pages/login/Login'
+import ClickToLog from './components/pages/login/ClickToLog'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -18,7 +19,8 @@ function App() {
     <>
       {/* <Navbar/> */}
       <Routes>
-      <Route path='/' element={<Home/>}></Route>
+      <Route path='/' element={<ClickToLog/>}></Route>
+      <Route path='/home' element={<Home/>}></Route>
       <Route path='/about' element={<About/>}></Route>
       <Route path='/contact' element={<Contact/>}></Route>
       <Route path='/transactions' element={<Transactions/>}></Route>

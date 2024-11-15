@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Input = ({ placeholder, name, type, value, handleChange }) => (
   <input
@@ -15,15 +15,18 @@ const Input = ({ placeholder, name, type, value, handleChange }) => (
 
 const Login = () => {
   const [Form, setForm] = useState({ email: "", password: "" });
+  
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...Form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const { email, password } = Form;
-      console.log(Form);
+      // console.log(Form);
       const body = { email, password };
       const response = await fetch("http://localhost:8000/login", {
         method: "POST",
@@ -31,6 +34,12 @@ const Login = () => {
         body: JSON.stringify(body),
       });
       console.log(response);
+      if (response.status === 201) {
+        navigate("/home");
+      }
+      else {
+        alert("email/password incorrect");
+      }
     } catch (error) {
       console.log(error);
     }

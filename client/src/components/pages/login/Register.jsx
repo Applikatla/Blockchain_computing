@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { NavLink } from "react-router-dom";
 const Input = ({ placeholder, name, type, value, handleChange }) => (
   <input
     placeholder={placeholder}
@@ -68,6 +69,14 @@ const Register = () => {
           >
           Register
         </button>
+        <div className="flex justify-center">
+            <div className="text-white flex gap-1">
+              Already Registerd?
+              <div>
+                <NavLink className={"text-blue-600/100"} to={"/login"}>Login</NavLink>
+              </div>
+            </div>
+          </div>
       </div>
     </div>
             </div>
