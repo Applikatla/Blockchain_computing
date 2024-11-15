@@ -1,7 +1,9 @@
 import { createContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
-
 import { contractABI, contractAddress } from "../utils/constants.js";
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+
 
 export const TransactionContext = createContext();
 
@@ -115,7 +117,11 @@ export const TransactionProvider = ({ children }) => {
       // alert(`Loading - ${transactionHash.hash}`);
       await transactionHash.wait();
       setisLoading(false);
-      alert(`Sucess - ${transactionHash.hash}`);
+      // alert(`Sucess - ${transactionHash.hash}`);
+      toast.success(`Transaction conformed: ${transactionHash.hash}`, {
+        position: 'top-right',
+        autoClose: 5000,
+      });
 
       setTHash(transactionHash);
 
@@ -126,6 +132,10 @@ export const TransactionProvider = ({ children }) => {
       const transactionsCount = await transactionContract.getTransactionCount();
     } catch (error) {
       console.log(error);
+      toast.error('Transaction Failed', {
+        position: 'top-right',
+        autoClose: 5000,
+      })
     }
   };
   useEffect(() => {
@@ -143,8 +153,8 @@ export const TransactionProvider = ({ children }) => {
         AccountId,
         isLoading,
         Isconform,
-        setIsconform
-      }}
+        setIsconform,
+      }}  
     >
       {children}
     </TransactionContext.Provider>

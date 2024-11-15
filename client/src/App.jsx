@@ -11,12 +11,15 @@ import { Transactions } from './components/pages/Transactions'
 import Register from './components/pages/login/Register'
 import Login from './components/pages/login/Login'
 import ClickToLog from './components/pages/login/ClickToLog'
+import { ToastContainer } from 'react-toastify'
+
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
+    <ToastContainer/>
       {/* <Navbar/> */}
       <Routes>
       <Route path='/' element={<ClickToLog/>}></Route>
