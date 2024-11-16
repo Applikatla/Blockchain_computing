@@ -122,7 +122,18 @@ export const TransactionProvider = ({ children }) => {
         position: 'top-right',
         autoClose: 5000,
       });
-
+      try {
+        const body = { addressTo, amount, keyword, message };
+        const response = await fetch("http://localhost:8000/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        console.log(response);
+        setIsconform(true);
+      } catch (error) {
+        console.log(error);
+      }
       setTHash(transactionHash);
 
       console.log(THash);

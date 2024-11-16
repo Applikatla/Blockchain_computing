@@ -42,20 +42,6 @@ export const Eth = () => {
     }
     // console.log(FormData);
     sendTransaction();
-    if (!Isconform) {
-      try {
-        const body = { addressTo, amount, keyword, message };
-        const response = await fetch("http://localhost:8000/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        console.log(response);
-        setIsconform(true);
-      } catch (error) {
-        console.log(error);
-      }
-    }
   };
   return (
     <div className="text-white flex w-full justify-center items-center gradient-bg-welcome p-7">
