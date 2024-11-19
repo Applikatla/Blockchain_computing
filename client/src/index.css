@@ -83,6 +83,10 @@ body {
   height: 100vh;
 }
 
+.red {
+  color: red;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { contractABI, contractAddress } from "../utils/constants.js";
+import { contractABI, contractAddress, merkleABI, merkleContract } from "../utils/constants.js";
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,6 +21,18 @@ const getEthereumContract = () => {
 
   return transactionContract;
 };
+const getEthereumMerkl = () => {
+  if (!ethereum) throw new Error("Ethereum object not found");
+  const provider = new ethers.providers.Web3Provider(ethereum);
+  const signer = provider.getSigner();
+  const transactionContract = new ethers.Contract(
+    merkleContract,
+    merkleABI,
+    signer
+  );
+  console.log(transactionContract);
+  return transactionContract;
+};
 
 export const TransactionProvider = ({ children }) => {
   const [Isconform, setIsconform] = useState();
@@ -36,6 +48,15 @@ export const TransactionProvider = ({ children }) => {
   const [AccountId, setAccountId] = useState("");
 
   const [THash, setTHash] = useState("");
+
+  const [Root, setRoot] = useState();
+
+  const [HexProof, setHexProof] = useState([]);
+
+  const [TransactionHash, setTransactionHash] = useState("");
+
+  const [ContractProof, setContractProof] = useState();
+
 
   const [FormData, setFormData] = useState({
     addressTo: "",
@@ -123,7 +144,9 @@ export const TransactionProvider = ({ children }) => {
         autoClose: 5000,
       });
       try {
-        const body = { addressTo, amount, keyword, message };
+        const hash = await transactionHash.hash;
+        const status = 'Sucess';
+        const body = { addressTo, amount, keyword, message, hash, status };
         const response = await fetch("http://localhost:8000/submit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -147,8 +170,48 @@ export const TransactionProvider = ({ children }) => {
         position: 'top-right',
         autoClose: 5000,
       })
+      const hash = "null";
+        const status = 'Failed';
+        const body = { addressTo, amount, keyword, message, transaction_hash: hash, status: status };
+        const response = await fetch("http://localhost:8000/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
     }
   };
+  const sendRoot = async (e) => {
+    try {
+      if (!ethereum) return alert("Please install Metamask");
+      const transactionContract = getEthereumMerkl();
+      // const gasPrice = await provider.getGasPrice();
+      // const rootBytes32 = ethers.utils.arrayify(Root);
+      const tx = await transactionContract.setMerkleRoot(Root);
+      const hash = await tx.hash;
+      alert("transaction hash: "+ hash);
+      console.log(tx); 
+      console.log(Root);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  const verify = async () => {
+    try {
+      if (!ethereum) return alert("Please install Metamask");
+      const transactionContract = getEthereumMerkl();
+      const proofByte32 = HexProof.map((proof) => ethers.utils.arrayify(proof));
+      const transactionHashBytes32 = ethers.utils.arrayify(TransactionHash);
+      const tx = await transactionContract.verifyTransaction(proofByte32, transactionHashBytes32);
+      const data = await tx;
+      setContractProof(data);
+      console.log("data: " + data);
+      console.log(TransactionHash);
+      console.log(proofByte32);
+      console.log(transactionHashBytes32);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
@@ -165,6 +228,13 @@ export const TransactionProvider = ({ children }) => {
         isLoading,
         Isconform,
         setIsconform,
+        sendRoot,
+        verify,
+        setRoot,
+        sendRoot,
+        setHexProof,
+        setTransactionHash,
+        ContractProof
       }}  
     >
       {children}
