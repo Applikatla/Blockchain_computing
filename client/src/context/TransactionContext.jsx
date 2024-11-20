@@ -188,30 +188,38 @@ export const TransactionProvider = ({ children }) => {
       // const rootBytes32 = ethers.utils.arrayify(Root);
       const tx = await transactionContract.setMerkleRoot(Root);
       const hash = await tx.hash;
-      alert("transaction hash: "+ hash);
+      // alert("transaction hash: "+ hash);
+      toast.success(`Transaction conformed: ${hash}`, {
+        position: 'top-right',
+        autoClose: 5000,
+      });
       console.log(tx); 
       console.log(Root);
     } catch (error) {
       console.log(error);
+      toast.error('Transaction Failed', {
+        position: 'top-right',
+        autoClose: 5000,
+      });
     }
   }
-  const verify = async () => {
-    try {
-      if (!ethereum) return alert("Please install Metamask");
-      const transactionContract = getEthereumMerkl();
-      const proofByte32 = HexProof.map((proof) => ethers.utils.arrayify(proof));
-      const transactionHashBytes32 = ethers.utils.arrayify(TransactionHash);
-      const tx = await transactionContract.verifyTransaction(proofByte32, transactionHashBytes32);
-      const data = await tx;
-      setContractProof(data);
-      console.log("data: " + data);
-      console.log(TransactionHash);
-      console.log(proofByte32);
-      console.log(transactionHashBytes32);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // const verify = async () => {
+  //   try {
+  //     if (!ethereum) return alert("Please install Metamask");
+  //     const transactionContract = getEthereumMerkl();
+  //     const proofByte32 = HexProof.map((proof) => ethers.utils.arrayify(proof));
+  //     const transactionHashBytes32 = ethers.utils.arrayify(TransactionHash);
+  //     const tx = await transactionContract.verifyTransaction(proofByte32, transactionHashBytes32);
+  //     const data = await tx;
+  //     setContractProof(data);
+  //     console.log("data: " + data);
+  //     console.log(TransactionHash);
+  //     console.log(proofByte32);
+  //     console.log(transactionHashBytes32);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
@@ -229,7 +237,7 @@ export const TransactionProvider = ({ children }) => {
         Isconform,
         setIsconform,
         sendRoot,
-        verify,
+        // verify,
         setRoot,
         sendRoot,
         setHexProof,

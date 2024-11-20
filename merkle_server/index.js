@@ -12,26 +12,28 @@ const app = express();
 const port = 8001;
 
 app.use(cors());
-
 app.use(express.json());
 
 const yourAlchemyAPIKey = process.env.API_KEY;
-
 const url = `https://eth-holesky.g.alchemy.com/v2/${yourAlchemyAPIKey}`;
 
-// Define the block number you want to check
-const blockNumberHex = '0x291988'; // Replace this with the hex of your block number
+let blockNum = null;  // Initially null
+let transactionHashes = null;
+let MerkleTreeData = null;
 
-const payload = {
-  jsonrpc: '2.0',
-  id: 1,
-  method: 'eth_getBlockByNumber',
-  params: [blockNumberHex, false]  // 'false' returns only transaction hashes
-};
+const fetchTransactionHashes = async () => {
+  if (!blockNum) {
+    console.error("Error: blockNum is not set.");
+    return;
+  }
 
-let transactionHashes = null; // Declare globally
+  const payload = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'eth_getBlockByNumber',
+    params: [blockNum, false]  // Use the updated blockNum
+  };
 
-const fetchTransactionHashes = async() => {
   try {
     const response = await axios.post(url, payload);
     transactionHashes = response.data.result.transactions;
@@ -39,54 +41,72 @@ const fetchTransactionHashes = async() => {
   } catch (error) {
     console.error("Error fetching transaction hashes:", error);
   }
-}
-let MerkleTreeData = null;
-let tree = null;
-// Call the function to fetch the data
-
-
+};
 
 app.get('/getsingletransaction', async (req, res) => {
-    fetchTransactionHashes().then(() => {
-        let i = Math.floor(Math.random() * transactionHashes.length);
-        res.json({transactions: transactionHashes[i]});
-    })
-})
+  await fetchTransactionHashes();
+  if (transactionHashes && transactionHashes.length) {
+    let i = Math.floor(Math.random() * transactionHashes.length);
+    res.json({ transaction: transactionHashes[i] });
+  } else {
+    res.status(500).json({ error: "No transactions found" });
+  }
+});
 
 app.get('/alltransactions', async (req, res) => {
-    fetchTransactionHashes().then(() => {
-        res.json({transactions: transactionHashes});
-    })
-})
-
+  await fetchTransactionHashes();
+  if (transactionHashes) {
+    res.json({ transactions: transactionHashes });
+  } else {
+    res.status(500).json({ error: "No transactions found" });
+  }
+});
 
 app.get('/merkle', async (req, res) => {
-    const merkleTree = await MerkleTreeData; 
-    res.json({root: merkleTree.root, tree: merkleTree.tree});
-})
+  if (MerkleTreeData) {
+    res.json({ root: MerkleTreeData.root, tree: MerkleTreeData.tree });
+  } else {
+    res.status(500).json({ error: "Merkle tree data not available" });
+  }
+});
 
 app.post('/mint', async (req, res) => {
-    fetchTransactionHashes().then(() => {
-        const address = req.body.transactions;
-        console.log(address);
-        console.log("Global access to transaction hashes:", transactionHashes);
-        const leaves = transactionHashes.map(tx => keccak256(tx));
-        const merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true });
-        const claimingAddress = keccak256(address);
-        const hexProof = merkleTree.getHexProof(claimingAddress);
-        const rootHash = merkleTree.getRoot();
-        const verifyProof = merkleTree.verify(hexProof, claimingAddress, rootHash);
-        console.log(hexProof);
-        console.log(verifyProof);
-        res.json({ proof: verifyProof, hex: hexProof, root: rootHash });
-        MerkleTreeData = {
-          root: merkleTree.getRoot().toString('hex'),
-          tree: merkleTree
-        }
-        console.log(MerkleTreeData);
-      });
-})
+  await fetchTransactionHashes();
+  if (!transactionHashes) {
+    res.status(500).json({ error: "No transactions found" });
+    return;
+  }
+
+  const address = req.body.transactions;
+  console.log("Address:", address);
+
+  const leaves = transactionHashes.map(tx => keccak256(tx));
+  const merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true });
+  const claimingAddress = keccak256(address);
+  const hexProof = merkleTree.getHexProof(claimingAddress);
+  const rootHash = merkleTree.getRoot();
+  const verifyProof = merkleTree.verify(hexProof, claimingAddress, rootHash);
+
+  res.json({ proof: verifyProof, hex: hexProof, root: rootHash });
+
+  MerkleTreeData = {
+    root: rootHash.toString('hex'),
+    tree: merkleTree
+  };
+});
+
+app.post('/getBlock', async (req, res) => {
+  const { block } = req.body;
+  blockNum = `0x${parseInt(block).toString(16)}`;
+  await fetchTransactionHashes();
+  if (transactionHashes && transactionHashes.length) {
+    let i = Math.floor(Math.random() * transactionHashes.length);
+    res.json({block: blockNum, transaction: transactionHashes[i] });
+  } else {
+    res.status(500).json({ error: "No transactions found" });
+  }
+});
 
 app.listen(port, () => {
-    console.log(`server started at port ${port}`);
-})
+  console.log(`Server started at port ${port}`);
+});
